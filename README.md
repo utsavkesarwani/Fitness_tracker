@@ -1,13 +1,15 @@
 # Gym Fitness Tracker
 
-This project includes the Phase 1 foundation and the Phase 2 dashboard experience for a full-stack gym and fitness tracking application. It includes:
+This project is a full-stack gym and fitness tracking application with real MongoDB-backed workout, measurement, weekly plan, analytics, and personal record data.
 
-- React + Vite frontend with Tailwind CSS
-- React Router-based dashboard navigation for all Phase 2 pages
-- Express.js backend with health-check and dashboard overview API
-- MongoDB connection setup using Mongoose
-- Environment variable configuration
-- Frontend/backend integration placeholders for later phases
+## Included features
+
+- React + Vite frontend with a dark dashboard UI
+- Protected JWT authentication for login, register, and demo access
+- Express.js backend with MongoDB persistence via Mongoose
+- Workout tracking, history, body measurements, and planner records
+- Analytics and personal records generated from stored workout data
+- Deployment-ready configuration guidance for local and production environments
 
 ## Project structure
 
@@ -27,7 +29,8 @@ gym-fitness-tracker/
 │   └── package.json
 ├── .gitignore
 ├── PROJECT_PLAN.md
-└── README.md
+├── README.md
+└── package-lock.json
 ```
 
 ## Start the frontend
@@ -48,9 +51,27 @@ cp .env.example .env
 npm run dev
 ```
 
-## Health check
+## Environment variables
+
+Server:
+
+```env
+PORT=5000
+CLIENT_URL=http://localhost:5173
+MONGODB_URI=
+JWT_SECRET=change-me-in-production
+```
+
+Client:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Health and auth checks
 
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000/api/health`
+- Auth: `POST /api/register`, `POST /api/login`, `POST /api/demo-login`
 
 The backend automatically uses MongoDB Atlas if `MONGODB_URI` is configured; otherwise it falls back to a temporary MongoDB in-memory instance so development can continue without a local MongoDB service.

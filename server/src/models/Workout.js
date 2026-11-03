@@ -21,6 +21,7 @@ const workoutExerciseSchema = new mongoose.Schema(
 
 const workoutSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     date: { type: Date, required: true },
     notes: { type: String, default: '' },
     durationMinutes: { type: Number, default: 45 },

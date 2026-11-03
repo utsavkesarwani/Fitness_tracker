@@ -1,4 +1,8 @@
+import { clearAuthSession, getStoredUser } from '../services/api';
+
 function SettingsPage() {
+  const user = getStoredUser();
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
@@ -19,10 +23,22 @@ function SettingsPage() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
           <h3 className="text-lg font-semibold text-white">Profile</h3>
           <div className="mt-4 space-y-3 text-sm text-slate-300">
+            <div className="flex justify-between"><span>Name</span><span className="text-white">{user?.name || 'Demo User'}</span></div>
+            <div className="flex justify-between"><span>Email</span><span className="text-white">{user?.email || 'demo@fitness.local'}</span></div>
             <div className="flex justify-between"><span>Units</span><span className="text-white">Metric</span></div>
             <div className="flex justify-between"><span>Goal</span><span className="text-white">Strength gain</span></div>
             <div className="flex justify-between"><span>Workout days</span><span className="text-white">6 / week</span></div>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              clearAuthSession();
+              window.location.href = '/auth';
+            }}
+            className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
+          >
+            Log out
+          </button>
         </div>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import express from 'express';
 import Workout from '../models/Workout.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
+router.use(protect);
 
 const sanitizeWorkout = (input) => {
   if (!input || !Array.isArray(input.exercises) || input.exercises.length === 0) {
@@ -52,7 +54,7 @@ const sanitizeWorkout = (input) => {
 router.get('/workouts', async (req, res) => {
   try {
     const { date } = req.query;
-    const query = {};
+    const query = { userId: req.user._id };
 
     if (date) {
       const targetDate = new Date(date);
@@ -77,7 +79,7 @@ router.get('/workouts', async (req, res) => {
 router.post('/workouts', async (req, res) => {
   try {
     const payload = sanitizeWorkout(req.body);
-    const workout = new Workout(payload);
+    const workout = new Workout({ ...payload, userId: req.user._id });
     await workout.save();
 
     return res.status(201).json({ workout });
