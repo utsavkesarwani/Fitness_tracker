@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import dashboardRoutes from './routes/dashboard.js';
 import healthRoutes from './routes/health.js';
+import workoutRoutes from './routes/workouts.js';
 
 dotenv.config();
 
@@ -25,5 +26,6 @@ app.get('/', (req, res) => {
 
 app.use('/api', healthRoutes);
 app.use('/api', dashboardRoutes);
+app.use('/api', workoutRoutes);
 
 export default app;
