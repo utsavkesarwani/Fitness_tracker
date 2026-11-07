@@ -1,7 +1,8 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fitness-tracker-secret';
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 
 export const signToken = (user) =>
   jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });

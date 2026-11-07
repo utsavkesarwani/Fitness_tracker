@@ -37,6 +37,7 @@ function DailyWorkoutPage() {
   const [exercises, setExercises] = useState([createExercise()]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [selectedWorkoutId, setSelectedWorkoutId] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -46,7 +47,8 @@ function DailyWorkoutPage() {
         setLoading(true);
         setError('');
         const response = await api.getWorkouts(workoutDate);
-        const savedWorkout = response.workouts?.[0];
+        const savedWorkout = response.workouts?.[0] || null;
+        setSelectedWorkoutId(savedWorkout?._id || null);
 
         if (savedWorkout) {
           setNotes(savedWorkout.notes || '');
@@ -209,10 +211,44 @@ function DailyWorkoutPage() {
         exercises: payloadExercises,
       };
 
-      await api.saveWorkout(payload);
-      setSuccess('Workout saved successfully.');
+      const response = selectedWorkoutId ? await api.updateWorkout(selectedWorkoutId, payload) : await api.saveWorkout(payload);
+      if (response?.workout?._id) {
+        setSelectedWorkoutId(response.workout._id);
+      }
+
+      setSuccess(selectedWorkoutId ? 'Workout updated successfully.' : 'Workout saved successfully.');
     } catch (err) {
       setError(err.message || 'Workout could not be saved.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    if (!selectedWorkoutId) {
+      setError('No workout is available to delete for this date.');
+      return;
+    }
+
+    const confirmed = window.confirm('Delete this workout?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError('');
+      setSuccess('');
+      await api.deleteWorkout(selectedWorkoutId);
+      setSelectedWorkoutId(null);
+      setNotes('');
+      setDurationMinutes('60');
+      setRestTimeSeconds('90');
+      setCompleted(true);
+      setExercises([createExercise()]);
+      setSuccess('Workout deleted successfully.');
+    } catch (err) {
+      setError(err.message || 'Workout could not be deleted.');
     } finally {
       setSaving(false);
     }
@@ -226,14 +262,26 @@ function DailyWorkoutPage() {
             <p className="text-sm text-slate-400">Today</p>
             <h2 className="text-2xl font-semibold text-white">Daily workout tracker</h2>
           </div>
-          <button
-            type="button"
-            onClick={handleSaveWorkout}
-            disabled={saving}
-            className="rounded-xl bg-teal-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-teal-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-          >
-            {saving ? 'Saving…' : 'Save workout'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {selectedWorkoutId ? (
+              <button
+                type="button"
+                onClick={handleDeleteWorkout}
+                disabled={saving}
+                className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 font-medium text-red-200 transition hover:border-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? 'Deleting…' : 'Delete workout'}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={handleSaveWorkout}
+              disabled={saving}
+              className="rounded-xl bg-teal-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-teal-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+            >
+              {saving ? (selectedWorkoutId ? 'Updating…' : 'Saving…') : selectedWorkoutId ? 'Update workout' : 'Save workout'}
+            </button>
+          </div>
         </div>
       </div>
 

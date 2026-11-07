@@ -76,6 +76,20 @@ router.get('/workouts', async (req, res) => {
   }
 });
 
+router.get('/workouts/:id', async (req, res) => {
+  try {
+    const workout = await Workout.findOne({ _id: req.params.id, userId: req.user._id });
+
+    if (!workout) {
+      return res.status(404).json({ message: 'Workout not found.' });
+    }
+
+    return res.status(200).json({ workout });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || 'Unable to fetch workout.' });
+  }
+});
+
 router.post('/workouts', async (req, res) => {
   try {
     const payload = sanitizeWorkout(req.body);
@@ -86,6 +100,40 @@ router.post('/workouts', async (req, res) => {
   } catch (error) {
     const statusCode = error.statusCode || 500;
     return res.status(statusCode).json({ message: error.message || 'Unable to save workout.' });
+  }
+});
+
+router.put('/workouts/:id', async (req, res) => {
+  try {
+    const payload = sanitizeWorkout(req.body);
+    const workout = await Workout.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      { ...payload, userId: req.user._id },
+      { new: true, runValidators: true },
+    );
+
+    if (!workout) {
+      return res.status(404).json({ message: 'Workout not found.' });
+    }
+
+    return res.status(200).json({ workout });
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    return res.status(statusCode).json({ message: error.message || 'Unable to update workout.' });
+  }
+});
+
+router.delete('/workouts/:id', async (req, res) => {
+  try {
+    const workout = await Workout.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+
+    if (!workout) {
+      return res.status(404).json({ message: 'Workout not found.' });
+    }
+
+    return res.status(200).json({ message: 'Workout deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || 'Unable to delete workout.' });
   }
 });
 

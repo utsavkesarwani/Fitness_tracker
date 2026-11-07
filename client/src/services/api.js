@@ -69,6 +69,21 @@ export const api = {
       fallbackMessage: 'Unable to save workout',
     }),
 
+  getWorkout: async (id) => request(`/workouts/${id}`, { fallbackMessage: 'Workout unavailable' }),
+
+  updateWorkout: async (id, workoutData) =>
+    request(`/workouts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(workoutData),
+      fallbackMessage: 'Unable to update workout',
+    }),
+
+  deleteWorkout: async (id) =>
+    request(`/workouts/${id}`, {
+      method: 'DELETE',
+      fallbackMessage: 'Unable to delete workout',
+    }),
+
   getMeasurements: async () => request('/measurements', { fallbackMessage: 'Measurements unavailable' }),
 
   saveMeasurement: async (measurementData) =>
